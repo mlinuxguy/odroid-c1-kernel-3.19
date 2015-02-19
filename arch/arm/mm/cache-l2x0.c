@@ -1646,9 +1646,8 @@ static const struct l2c_init_data of_tauros3_data __initconst = {
 
 #define L2C_ID(name, fns) { .compatible = name, .data = (void *)&fns }
 static const struct of_device_id l2x0_ids[] __initconst = {
-#ifdef CONFIG_PLAT_MESON
-    L2C_ID("arm,meson-pl310-cache", meson_pl310_data ),
-#endif
+/*    L2C_ID("arm,meson-pl310-cache", meson_pl310_data ), */
+    L2C_ID("arm,meson-pl310-cache", of_l2c310_data ),
 	L2C_ID("arm,l210-cache", of_l2c210_data),
 	L2C_ID("arm,l220-cache", of_l2c220_data),
 	L2C_ID("arm,pl310-cache", of_l2c310_data),
