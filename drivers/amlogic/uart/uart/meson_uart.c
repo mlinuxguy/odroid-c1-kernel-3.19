@@ -393,7 +393,7 @@ am_uart_set_termios(struct uart_port *port, struct ktermios *termios,
 }
 
 static void
-am_uart_set_ldisc(struct uart_port *port,int new)
+am_uart_set_ldisc(struct uart_port *port,struct ktermios *termios)
 {
 	return;
 }
