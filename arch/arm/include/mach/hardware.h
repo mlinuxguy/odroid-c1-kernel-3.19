@@ -1,5 +1,3 @@
 /*
- * arch/arm/mach-meson8b/include/mach/hardware.h
+ * arch/arm/mach-omap2/include/mach/hardware.h
  */
-#include <asm/sizes.h>
-#include <mach/io.h>
