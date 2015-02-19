@@ -597,6 +597,7 @@ config PLAT_MESON
     select FIQ
     select USE_OF
     select GENERIC_ALLOCATOR
+	select HAVE_ARM_SCU
     select GENERIC_CLOCKEVENTS
     select NEED_MACH_MEMORY_H
     select CLKDEV_LOOKUP
