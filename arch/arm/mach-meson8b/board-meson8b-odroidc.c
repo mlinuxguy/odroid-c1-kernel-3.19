@@ -48,7 +48,7 @@
 
 #include <linux/amlogic/vmapi.h>
 
-extern void meson_common_restart(char mode,const char *cmd);
+extern void meson_common_restart(enum reboot_mode mode,const char *cmd);
 static void meson_map_board_io(void);
 extern unsigned long long aml_reserved_start;
 extern unsigned long long aml_reserved_end;

@@ -37,7 +37,7 @@
  *
  *
  */
-void meson_common_restart(char mode,const char *cmd)
+void meson_common_restart(enum reboot_mode mode,const char *cmd)
 {
     u32 reboot_reason = MESON_NORMAL_BOOT;
     if (cmd) {
