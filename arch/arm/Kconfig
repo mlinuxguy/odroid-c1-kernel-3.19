@@ -180,6 +180,13 @@ config ARCH_HAS_ILOG2_U32
 config ARCH_HAS_ILOG2_U64
 	bool
 
+config ARCH_HAS_CPUFREQ
+    bool
+    help
+      Internal node to signify that the ARCH has CPUFREQ support
+      and that the relevant menu configurations are displayed for
+      it.
+
 config ARCH_HAS_BANDGAP
 	bool
 
