@@ -33,6 +33,13 @@
 #include "cache-tauros3.h"
 #include "cache-aurora-l2.h"
 
+#ifdef CONFIG_PLAT_MESON
+#include <mach/io.h>
+#ifdef CONFIG_MESON_TRUSTZONE
+#include <mach/meson-secure.h>
+#endif
+#endif
+
 struct l2c_init_data {
 	const char *type;
 	unsigned way_size_0;
@@ -85,7 +92,11 @@ static void l2c_write_sec(unsigned long val, void __iomem *base, unsigned reg)
  */
 static inline void l2c_set_debug(void __iomem *base, unsigned long val)
 {
+#ifdef CONFIG_MESON_TRUSTZONE
+    meson_smc1(TRUSTZONE_MON_L2X0_DEBUG_INDEX, val);
+#else
 	l2c_write_sec(val, base, L2X0_DEBUG_CTRL);
+#endif
 }
 
 static void __l2c_op_way(void __iomem *reg)
@@ -198,7 +209,11 @@ static void l2x0_disable(void)
 
 	raw_spin_lock_irqsave(&l2x0_lock, flags);
 	__l2x0_flush_all();
+#ifdef CONFIG_MESON_TRUSTZONE
+    meson_smc1(TRUSTZONE_MON_L2X0_CTRL_INDEX, 0);
+#else
 	l2c_write_sec(0, l2x0_base, L2X0_CTRL);
+#endif
 	dsb(st);
 	raw_spin_unlock_irqrestore(&l2x0_lock, flags);
 }
@@ -1418,6 +1433,26 @@ static const struct l2c_init_data of_aurora_no_outer_data __initconst = {
 	},
 };
 
+#ifdef CONFIG_PLAT_MESON
+static const struct l2c_init_data meson_pl310_data __initconst = {
+/* fix    .setup = meson_of_setup, */
+    .save  = l2c310_save,
+/*	.of_parse = l2x0_of_parse, */
+	.of_parse = l2c310_of_parse, 
+    .outer_cache = {
+        .resume      = l2c310_resume,
+        .inv_range   = l2c210_inv_range,
+        .clean_range = l2c210_clean_range,
+        .flush_range = l2c210_flush_range,
+        .sync        = l2c210_sync,
+        .flush_all   = l2c210_flush_all,
+/* fix        .inv_all     = l2x0_inv_all, */
+        .disable     = l2c310_disable,
+/* fix        .set_debug   = pl310_set_debug, */
+    },
+};
+#endif
+
 /*
  * For certain Broadcom SoCs, depending on the address range, different offsets
  * need to be added to the address before passing it to L2 for
@@ -1611,6 +1646,9 @@ static const struct l2c_init_data of_tauros3_data __initconst = {
 
 #define L2C_ID(name, fns) { .compatible = name, .data = (void *)&fns }
 static const struct of_device_id l2x0_ids[] __initconst = {
+#ifdef CONFIG_PLAT_MESON
+    L2C_ID("arm,meson-pl310-cache", meson_pl310_data ),
+#endif
 	L2C_ID("arm,l210-cache", of_l2c210_data),
 	L2C_ID("arm,l220-cache", of_l2c220_data),
 	L2C_ID("arm,pl310-cache", of_l2c310_data),
@@ -1636,10 +1674,13 @@ int __init l2x0_of_init(u32 aux_val, u32 aux_mask)
 
 	if (of_address_to_resource(np, 0, &res))
 		return -ENODEV;
-
+#ifdef CONFIG_PLAT_MESON
+    l2x0_base = (void __iomem *)IO_PL310_BASE;
+#else
 	l2x0_base = ioremap(res.start, resource_size(&res));
 	if (!l2x0_base)
 		return -ENOMEM;
+#endif
 
 	l2x0_saved_regs.phy_base = res.start;
 

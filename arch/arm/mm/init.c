@@ -407,6 +407,7 @@ free_memmap(unsigned long start_pfn, unsigned long end_pfn)
 /*
  * The mem_map array can get very big.  Free the unused area of the memory map.
  */
+#ifndef CONFIG_PLAT_MESON /* fix */
 static void __init free_unused_memmap(void)
 {
 	unsigned long start, prev_end = 0;
@@ -456,7 +457,7 @@ static void __init free_unused_memmap(void)
 			    ALIGN(prev_end, PAGES_PER_SECTION));
 #endif
 }
-
+#endif /* fix */
 #ifdef CONFIG_HIGHMEM
 static inline void free_area_high(unsigned long pfn, unsigned long end)
 {
@@ -529,7 +530,9 @@ void __init mem_init(void)
 	set_max_mapnr(pfn_to_page(max_pfn) - mem_map);
 
 	/* this will put all unused low memory onto the freelists */
+#ifndef CONFIG_PLAT_MESON /* fix */
 	free_unused_memmap();
+#endif
 	free_all_bootmem();
 
 #ifdef CONFIG_SA1111
