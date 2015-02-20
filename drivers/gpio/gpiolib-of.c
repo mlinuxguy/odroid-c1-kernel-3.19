@@ -102,6 +102,20 @@ struct gpio_desc *of_get_named_gpiod_flags(struct device_node *np,
 	return gg_data.out_gpio;
 }
 
+#if defined(CONFIG_ARCH_MESON8B)
+#include <linux/amlogic/aml_gpio_consumer.h>
+int of_get_named_gpio_flags(struct device_node *np, const char *propname,
+                int index __attribute__((unused)),
+                enum of_gpio_flags *flags __attribute__((unused)))
+{
+    const char *str;
+
+    if(of_property_read_string(np, "gpios", &str))
+        return -EPROBE_DEFER;
+
+    return  amlogic_gpio_name_map_num(str);
+}
+#else
 int of_get_named_gpio_flags(struct device_node *np, const char *list_name,
 			    int index, enum of_gpio_flags *flags)
 {
@@ -114,8 +128,8 @@ int of_get_named_gpio_flags(struct device_node *np, const char *list_name,
 	else
 		return desc_to_gpio(desc);
 }
+#endif
 EXPORT_SYMBOL(of_get_named_gpio_flags);
-
 /**
  * of_gpio_simple_xlate - translate gpio_spec to the GPIO number and flags
  * @gc:		pointer to the gpio_chip structure

@@ -370,11 +370,16 @@ static void gic_cpu_if_up(void)
 static void __init gic_dist_init(struct gic_chip_data *gic)
 {
 	unsigned int i;
+	unsigned int trigger;	/* added for MESON */
 	u32 cpumask;
 	unsigned int gic_irqs = gic->gic_irqs;
 	void __iomem *base = gic_data_dist_base(gic);
 
 	writel_relaxed(GICD_DISABLE, base + GIC_DIST_CTRL);
+/* fix needed for MESON */
+    trigger = 0xFFFFFFFF; // edge
+    for (i = 32; i < gic_irqs; i += 16)
+        writel_relaxed(trigger, base + GIC_DIST_CONFIG + i * 4 / 16);
 
 	/*
 	 * Set all global interrupts to this CPU only.
