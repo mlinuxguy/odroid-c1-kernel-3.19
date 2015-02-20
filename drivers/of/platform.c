@@ -74,6 +74,9 @@ void of_device_make_bus_id(struct device *dev)
 	struct device_node *node = dev->of_node;
 	const __be32 *reg;
 	u64 addr;
+#if defined(CONFIG_PLAT_MESON)
+    const char *name;
+#endif
 
 	/* Construct the name, using parent nodes if necessary to ensure uniqueness */
 	while (node->parent) {
@@ -88,6 +91,16 @@ void of_device_make_bus_id(struct device *dev)
 				     dev_name(dev));
 			return;
 		}
+#if defined(CONFIG_PLAT_MESON)
+    name = of_get_property(node,"dev_name",NULL);
+    if (name){
+        dev_set_name(dev, "%s", name);
+        pr_debug("+++%s: %s care the dev_name!(PLAT_MESON)\n",__func__,node->full_name);
+        return;
+    }
+    else
+        pr_debug("+++%s: %s don't care the dev_name!!!(PLAT_MESON)\n",__func__,node->full_name);
+#endif
 
 		/* format arguments only used if dev_name() resolves to NULL */
 		dev_set_name(dev, dev_name(dev) ? "%s:%s" : "%s",

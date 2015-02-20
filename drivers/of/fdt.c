@@ -977,10 +977,10 @@ unsigned long long get_reserve_block_size(int blockid)
 int __init early_init_dt_scan_reserve_memory(unsigned long node, const char *uname,
 				     int depth, void *data)
 {
-	__be32 *mem, *endp;
-	char * need_iomap=NULL;
+	const __be32 *mem, *endp;
+	const char * need_iomap=NULL;
 	unsigned int iomap_flag = 0;
-	unsigned long l;
+	int l;
 	int idx=0;
 	struct reserve_mem * prm;
 
@@ -1043,7 +1043,7 @@ int __init early_init_dt_scan_memory(unsigned long node, const char *uname,
 				     int depth, void *data)
 {
 	const char *type = of_get_flat_dt_prop(node, "device_type", NULL);
-	const __be32 *reg, *endp;
+	const __be32 *reg;
 	int l;
 #if defined(CONFIG_PLAT_MESON)
 	unsigned long long high_reserve_size;
@@ -1103,7 +1103,7 @@ int __init early_init_dt_scan_memory(unsigned long node, const char *uname,
 
 	set_memory_start_addr(phys_offset);
 	set_memory_total_size(total);
-#if MESON_CPU_TYPE >= MESON_CPU_TYPE_MESON6TV
+#if defined(CONFIG_PLAT_MESON)
 	early_init_dt_add_memory_arch(aml_reserved_end+1,phys_offset+total-aml_reserved_end-1-high_reserve_size);
 #else
 	if(aml_reserved_end+1 > FIRMWARE_ADDR)
