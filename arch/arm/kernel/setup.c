@@ -723,7 +723,10 @@ static int __init early_mem(char *p)
 	u64 size;
 	u64 start;
 	char *endp;
-
+#if (defined CONFIG_OF ) && (defined CONFIG_PLAT_MESON )
+    printk(KERN_WARNING "Ignore bootargs \'mem\' param.\n");
+    return 0;
+#endif
 	/*
 	 * If the user specifies memory size, we
 	 * blow away any automatically generated

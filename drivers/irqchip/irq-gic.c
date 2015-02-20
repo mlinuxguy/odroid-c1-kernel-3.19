@@ -376,10 +376,12 @@ static void __init gic_dist_init(struct gic_chip_data *gic)
 	void __iomem *base = gic_data_dist_base(gic);
 
 	writel_relaxed(GICD_DISABLE, base + GIC_DIST_CTRL);
+#if CONFIG_PLAT_MESON
 /* fix needed for MESON */
     trigger = 0xFFFFFFFF; // edge
     for (i = 32; i < gic_irqs; i += 16)
         writel_relaxed(trigger, base + GIC_DIST_CONFIG + i * 4 / 16);
+#endif
 
 	/*
 	 * Set all global interrupts to this CPU only.
